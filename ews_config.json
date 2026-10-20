@@ -1,0 +1,34 @@
+{
+  "canvasConfigPath": "C:\\Users\\mmerideth\\CanvasDashboard\\config.json",
+  "omniFolder": "G:\\Shared drives\\Operations\\Daily Reports\\SY2627",
+  "omniFolderDriveId": "1EgNH0iFNVbbUNfufU89IAiHLMXWlAAoo",
+  "attendanceDataPath": "C:\\Users\\mmerideth\\PassingRateDashboard\\data\\attendance_students.json",
+  "schools": {
+    "500": {"level": "Elementary", "canvasSubAccount": 107},
+    "600": {"level": "Middle", "canvasSubAccount": 110},
+    "700": {"level": "High", "canvasSubAccount": 211}
+  },
+  "inScope": ["700"],
+  "inScopeNote": "High school (Full-Time) only for now. Elementary/Middle need different course-failure measures; SOEP gets its own dashboard.",
+  "passingScore": 60,
+  "indicators": {
+    "course_failure":  {"label": "Course failures",   "basis": "statute", "rule": "failing_courses >= 2"},
+    "attendance":      {"label": "Attendance",        "basis": "statute", "rule": "ca_streak >= 4"},
+    "behavior":        {"label": "Behavior",          "basis": "statute", "rule": null, "note": "no data source yet"},
+    "discipline":      {"label": "Discipline/safety", "basis": "statute", "rule": null, "note": "no data source yet"},
+    "inactivity":      {"label": "Canvas inactivity", "basis": "local",   "rule": "days_inactive >= 7"},
+    "missing_work":    {"label": "Missing work",      "basis": "local",   "rule": "missing_14d >= 10"},
+    "prior_core":      {"label": "Failed prior quarter of a core course now continuing", "basis": "local", "rule": "prior_core_repeat >= 1",
+                        "note": "2025-26 full-time: students who failed Q1 of a core sequence passed its Q2 32-66% of the time vs 88-98% for those who passed Q1"},
+    "prior_failures":  {"label": "Failed 2+ courses last quarter", "basis": "local", "rule": "prior_failed >= 2",
+                        "note": "2025-26 full-time: 60% (2 failures) and 79% (3+) failed a Q2 course vs 8% with none; 1 failure = 53%"}
+  },
+  "thresholdsSetOn": "2026-10-08",
+  "thresholdsNote": "HS calibration from the 10/8 distribution; recalibrate at the start of Q2.",
+  "defaultReviewDays": 14,
+  "tiers": [
+    {"tier": 3, "minFlags": 3},
+    {"tier": 2, "minFlags": 2},
+    {"tier": 1, "minFlags": 1}
+  ]
+}

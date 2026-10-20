@@ -1,0 +1,41 @@
+{
+  "_note": "Starter library for review by the HS team (e.g. Laura). The evidence field names the general practice only; each entry needs a verified evidence source before the library is presented as 'evidence-based' to USBE.",
+  "strategies": [
+    {"indicator": "course_failure", "tier": 2, "name": "Targeted tutoring / small-group live session",
+     "description": "Teacher or tutor runs a recurring small-group or 1:1 live session on the specific failing course content.",
+     "evidence": "Tutoring (high-dosage) - source to verify"},
+    {"indicator": "course_failure", "tier": 2, "name": "Academic recovery plan",
+     "description": "Student, teacher and family agree on a written plan: assignments to recover, dates, and a weekly check.",
+     "evidence": "Goal-setting and progress monitoring - source to verify"},
+    {"indicator": "course_failure", "tier": 3, "name": "Counselor schedule and pathway review",
+     "description": "Counselor reviews course load and graduation pathway; adjusts schedule or refers to credit recovery.",
+     "evidence": "Local practice - source to verify"},
+
+    {"indicator": "missing_work", "tier": 2, "name": "Weekly missing-work report to family",
+     "description": "Mentor sends the Learning Coach a weekly list of missing work with due dates and a contact for help.",
+     "evidence": "Family communication about missing assignments - source to verify"},
+    {"indicator": "missing_work", "tier": 2, "name": "Structured work-completion block",
+     "description": "Student attends a scheduled live study hall with a staff member until missing work drops below threshold.",
+     "evidence": "Local practice - source to verify"},
+    {"indicator": "missing_work", "tier": 3, "name": "Pacing plan reset",
+     "description": "Counselor and teachers build a revised pacing calendar the student can realistically finish.",
+     "evidence": "Local practice - source to verify"},
+
+    {"indicator": "inactivity", "tier": 2, "name": "Mentor daily check-in / check-out",
+     "description": "Mentor checks in at the start and end of each school day for 2-4 weeks and tracks logins.",
+     "evidence": "Check-In/Check-Out (CICO) - source to verify"},
+    {"indicator": "inactivity", "tier": 3, "name": "Re-engagement conference",
+     "description": "Live meeting with student, Learning Coach, mentor and counselor to identify barriers and set a return plan.",
+     "evidence": "Local practice - source to verify"},
+
+    {"indicator": "attendance", "tier": 2, "name": "Attendance improvement plan",
+     "description": "Written plan with the family covering barriers, daily attendance expectations, and a weekly review.",
+     "evidence": "Attendance plans / tiered attendance supports - source to verify"},
+    {"indicator": "attendance", "tier": 2, "name": "Mentor attendance check-in",
+     "description": "Mentor contacts student and Learning Coach after each unexcused day; logs contact and reason.",
+     "evidence": "Check-In/Check-Out (CICO) - source to verify"},
+    {"indicator": "attendance", "tier": 3, "name": "Attendance team meeting",
+     "description": "Attendance team, counselor and family meet; plan includes supports and, where required, statutory steps.",
+     "evidence": "Local practice - source to verify; statutory steps need compliance review"}
+  ]
+}

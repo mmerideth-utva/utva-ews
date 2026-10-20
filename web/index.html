@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Early Warning · UTVA HS</title>
+<link rel="stylesheet" href="nocturne.css">
+<style>
+  body { margin: 0; background: var(--color-bg); }
+  .page { min-height: 100vh; background: radial-gradient(1000px 420px at 100% 0%, var(--color-accent-900), transparent 70%), var(--color-bg); color: var(--color-text); }
+  .shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 100vh; }
+  .shell > * { min-width: 0; }
+  .side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 22px; padding: 18px 14px; box-shadow: inset -1px 0 0 var(--color-divider); }
+  .side-brand { display: flex; flex-direction: column; gap: 2px; padding: 0 10px; font-weight: 500; font-size: 18px; }
+  .side-brand span:last-child { font-size: 13px; font-weight: 400; color: var(--color-neutral-400); }
+  .side-nav { display: flex; flex-direction: column; gap: 2px; }
+  .side-link { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-md); color: var(--color-neutral-300); text-decoration: none; font-size: 14px; }
+  .side-link:hover { color: var(--color-text); background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+  .side-link[aria-current="page"] { color: var(--color-accent-300); background: color-mix(in srgb, var(--color-accent) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent); }
+  .side-foot { margin-top: auto; padding: 0 10px; display: flex; flex-direction: column; gap: 6px; }
+  .side-foot label { font-size: 11px; color: var(--color-neutral-400); }
+  .side-foot small { font-size: 11px; color: var(--color-neutral-500); line-height: 1.5; }
+  header.top { max-width: 1200px; margin: 0 auto; padding: 18px 28px 6px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  header.top h1 { font-size: 20px; margin: 0; }
+  .meta { font-size: 13px; color: var(--color-neutral-400); }
+  main { max-width: 1200px; margin: 0 auto; padding: 14px 28px 64px; display: flex; flex-direction: column; gap: 22px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .kpi { padding: 14px 16px; gap: 6px; cursor: pointer; border: none; text-align: left; color: inherit; font: inherit; }
+  .kpi:hover { filter: brightness(1.12); }
+  .kpi .n { font-size: 28px; font-weight: 500; line-height: 1; }
+  .kpi .s { font-size: 12px; color: var(--color-neutral-400); }
+  .kpi.on { box-shadow: inset 0 0 0 1px var(--color-accent); }
+  .tag { white-space: nowrap; }
+  .t1 { background: var(--color-neutral-800); color: var(--color-neutral-100); }
+  .t2 { background: var(--color-accent-800); color: var(--color-accent-100); }
+  .t3 { background: var(--color-accent-600); color: #fff; }
+  .flag { background: transparent; box-shadow: inset 0 0 0 1px var(--color-divider); color: var(--color-neutral-200); padding: 1px 8px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--color-neutral-500); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 18px; align-items: start; }
+  .panel { padding: 16px 18px; gap: 12px; }
+  .ind { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent); font-size: 14px; }
+  .ind:last-child { border-bottom: none; }
+  .ind .v { font-variant-numeric: tabular-nums; font-weight: 500; }
+  .ind .rule { font-size: 12px; color: var(--color-neutral-500); }
+  .plan { padding: 14px 16px; gap: 10px; box-shadow: var(--shadow-sm); }
+  .plan.closed { opacity: .75; }
+  .plan-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px 14px; font-size: 13px; }
+  .kv b { display: block; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-400); font-weight: 400; }
+  .note { font-size: 13px; padding: 8px 10px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-text) 4%, transparent); }
+  .note .who { font-size: 11px; color: var(--color-neutral-400); margin-bottom: 2px; }
+  form.stack, .stack { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .row > .field { flex: 1 1 180px; }
+  .err { font-size: 13px; color: #f0a0a0; min-height: 0; }
+  .ok { font-size: 13px; color: var(--color-accent-300); }
+  .eff { font-size: 12px; display: flex; gap: 12px; flex-wrap: wrap; color: var(--color-neutral-300); }
+  .lib-ind { display: flex; flex-direction: column; gap: 8px; }
+  .empty { padding: 28px; color: var(--color-neutral-400); font-size: 14px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 12px 16px; box-shadow: inset 0 -1px 0 var(--color-divider); }
+    .side-nav { flex-direction: row; }
+    .side-foot { margin: 0; flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="page"><div class="shell">
+  <aside class="side">
+    <div class="side-brand"><span>UTVA</span><span>Early Warning · HS</span></div>
+    <nav class="side-nav" aria-label="Pages">
+      <a class="side-link" href="#/queue" data-view="queue">Queue</a>
+      <a class="side-link" href="#/library" data-view="library">Strategy library</a>
+    </nav>
+    <div class="side-foot">
+      <label for="actor">Acting as</label>
+      <input class="input" id="actor" placeholder="Your name" autocomplete="name">
+      <small>Prototype: no sign-in yet, so this name is self-reported. Student IDs only.</small>
+    </div>
+  </aside>
+  <div>
+    <header class="top"><h1 id="title">Queue</h1><span class="meta" id="meta"></span></header>
+
+    <main id="view-queue">
+      <section class="kpis" id="kpis"></section>
+      <div class="card" style="padding: 6px 14px 10px;">
+        <div style="overflow-x:auto">
+          <table class="table" style="font-size: 13px; min-width: 760px;">
+            <thead><tr><th>Student ID</th><th>Grade</th><th>Tier</th><th>Flags</th><th>Counselor</th><th>Plans</th><th>Next review</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <main id="view-student" hidden></main>
+
+    <main id="view-library" hidden>
+      <p class="meta" style="margin:0">Starter strategies for the HS team to review. Each entry's evidence source still needs verifying before the library is presented to USBE as evidence-based.</p>
+      <div class="grid2" id="library"></div>
+    </main>
+  </div>
+</div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtDate = s => s ? new Date(s.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—';
+const S = { meta: null, students: null, filter: 'needs_plan' };
+const QUEUES = [
+  { key: 'needs_plan', label: 'Needs a plan', sub: 'Tier 2–3, no open plan' },
+  { key: 'review_due', label: 'Review due', sub: 'open plan past its review date' },
+  { key: 'active', label: 'Active plans', sub: 'open and on schedule' },
+  { key: 'monitor', label: 'Tier 1 · monitor', sub: 'one flag, no plan required' },
+  { key: 'all', label: 'All flagged', sub: 'every tiered student' },
+];
+try { $('actor').value = localStorage.getItem('ews.actor') || ''; } catch (e) {}
+$('actor').addEventListener('input', () => { try { localStorage.setItem('ews.actor', $('actor').value); } catch (e) {} });
+const actor = () => $('actor').value.trim();
+const indLabel = k => S.meta.indicators[k]?.label || k;
+const tierTag = t => t ? `<span class="tag t${t}">Tier ${t}</span>` : '<span class="muted">—</span>';
+
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+async function loadAll() {
+  [S.meta, S.students] = await Promise.all([api('/api/meta'), api('/api/students')]);
+  $('meta').textContent = `Data as of ${fmtDate(S.meta.asOf)} · ${S.meta.students} active HS students · thresholds set ${fmtDate(S.meta.thresholdsSetOn)}`;
+}
+
+// ── Queue ──────────────────────────────────────────────────────
+function renderQueue() {
+  const L = S.students.students;
+  const count = k => k === 'all' ? L.length : L.filter(s => s.queue === k).length;
+  $('kpis').innerHTML = QUEUES.map(q => `<button class="card kpi ${S.filter === q.key ? 'on' : ''}" data-q="${q.key}">
+    <span class="card-kicker" style="color:var(--color-neutral-400)">${q.label}</span><span class="n">${count(q.key)}</span><span class="s">${q.sub}</span></button>`).join('');
+  const rows = L.filter(s => S.filter === 'all' || s.queue === S.filter)
+    .sort((a, b) => b.tier - a.tier || b.flags.length - a.flags.length || String(a.nextReview).localeCompare(String(b.nextReview)));
+  $('rows').innerHTML = rows.length ? rows.map(s => `
+    <tr style="cursor:pointer" data-id="${esc(s.id)}">
+      <td style="font-weight:500;font-variant-numeric:tabular-nums"><a href="#/student/${esc(s.id)}" style="color:inherit;text-decoration:none">${esc(s.id)}</a></td>
+      <td>${s.grade ?? '—'}</td><td>${tierTag(s.tier)}</td>
+      <td>${s.flags.map(f => `<span class="tag flag">${esc(indLabel(f))}</span>`).join(' ') || '<span class="muted">—</span>'}</td>
+      <td>${esc(s.counselor || '—')}</td><td class="num">${s.openPlans || ''}</td>
+      <td>${s.nextReview ? fmtDate(s.nextReview) : '<span class="muted">—</span>'}</td>
+    </tr>`).join('') : '<tr><td colspan="7" class="muted">No students in this queue.</td></tr>';
+}
+$('kpis').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) { S.filter = b.dataset.q; renderQueue(); } });
+$('rows').addEventListener('click', e => { const r = e.target.closest('tr[data-id]'); if (r) location.hash = '#/student/' + r.dataset.id; });
+
+// ── Student ────────────────────────────────────────────────────
+function indicatorRows(snap) {
+  const ind = S.meta.indicators, v = snap?.values || {}, on = new Set(snap?.flags || []);
+  const valueOf = { course_failure: v.failing_courses != null ? `${v.failing_courses} of ${v.graded_courses} courses` : '—',
+    missing_work: v.missing_14d ?? '—', inactivity: v.days_inactive == null ? (v.graded_courses != null ? 'never active' : '—') : v.days_inactive + ' d',
+    attendance: v.ca_streak != null ? v.ca_streak + ' d streak' : '—', behavior: 'no data source', discipline: 'no data source' };
+  return Object.entries(ind).map(([k, d]) => `<div class="ind">
+    <div>${esc(d.label)} <span class="rule">${d.rule ? esc(d.rule.replace(/_/g, ' ')) : esc(d.note || '')} · ${d.basis === 'statute' ? 'state-required' : 'local criterion'}</span></div>
+    <span class="v ${d.rule ? '' : 'muted'}">${esc(valueOf[k])}</span>
+    ${on.has(k) ? '<span class="tag t2">Flagged</span>' : '<span class="tag flag">—</span>'}</div>`).join('');
+}
+
+function effectiveness(p) {
+  const a = p.baseline?.values, b = (p.outcome_snapshot || S.cur.history.at(-1))?.values;
+  if (!a || !b) return '';
+  const pairs = [['Failing', 'failing_courses'], ['Missing', 'missing_14d'], ['Inactive d', 'days_inactive'], ['Absence streak', 'ca_streak']];
+  return `<div class="eff">${pairs.map(([l, k]) => `<span>${l}: ${a[k] ?? '—'} → <b style="color:var(--color-text)">${b[k] ?? '—'}</b></span>`).join('')}
+    <span class="muted">(${p.status === 'open' ? 'start → now' : 'start → close'})</span></div>`;
+}
+
+function planCard(p) {
+  const open = p.status === 'open';
+  const overdue = open && p.review_date <= new Date().toISOString().slice(0, 10);
+  return `<article class="card plan ${open ? '' : 'closed'}" data-plan="${p.intervention_id}">
+    <div class="plan-head">
+      <div><div class="card-title">${esc(p.strategy || 'Strategy')}</div>
+        <div class="meta">${esc(indLabel(p.indicator))} · Tier ${p.tier} plan · started ${fmtDate(p.start_date)} by ${esc(p.created_by)}</div></div>
+      <span class="tag ${open ? (overdue ? 't3' : 't2') : 't1'}">${open ? (overdue ? 'Review due' : 'Open') : 'Closed · ' + esc(p.outcome.replace('_', ' '))}</span>
+    </div>
+    <div class="kv"><div><b>Owner</b>${esc(p.owner)}</div><div><b>Review by</b>${fmtDate(p.review_date)}</div>
+      <div style="grid-column: span 2"><b>Goal</b>${esc(p.goal || '—')}</div></div>
+    ${effectiveness(p)}
+    <div class="stack">${p.notes.map(n => `<div class="note"><div class="who">${esc(n.author)} · ${fmtDate(n.created_at)}${n.audience === 'parent-visible' ? ' · parent-visible' : ''}</div>${esc(n.body)}</div>`).join('')}</div>
+    ${open ? `
+    <form class="stack" data-act="note">
+      <div class="row"><div class="field" style="flex:3 1 260px"><textarea class="input" name="body" rows="2" placeholder="Progress note"></textarea></div>
+        <div class="field"><select class="input" name="audience"><option value="staff">Staff only</option><option value="parent-visible">Parent-visible</option></select></div></div>
+      <div class="row"><button class="btn btn-secondary" type="submit">Add note</button><span class="err" role="alert"></span></div>
+    </form>
+    <form class="stack" data-act="close">
+      <div class="row"><div class="field"><select class="input" name="outcome"><option value="">Close with outcome…</option>
+        <option value="improved">Improved</option><option value="no_change">No change</option><option value="worsened">Worsened</option><option value="escalated">Escalated to higher tier</option></select></div>
+        <div class="field" style="flex:2 1 220px"><input class="input" name="note" placeholder="Closing note (optional)"></div></div>
+      <div class="row"><button class="btn btn-secondary" type="submit">Close plan</button><span class="err" role="alert"></span></div>
+    </form>` : ''}
+  </article>`;
+}
+
+function newPlanForm(snap) {
+  const flagged = snap?.flags || [];
+  const inds = Object.entries(S.meta.indicators).filter(([, d]) => d.rule).sort(([a], [b]) => flagged.includes(b) - flagged.includes(a));
+  const review = new Date(Date.now() + S.meta.defaultReviewDays * 864e5).toISOString().slice(0, 10);
+  return `<div class="card panel"><span class="card-kicker">New plan</span><div class="card-title">Start an intervention</div>
+    <form class="stack" data-act="create">
+      <div class="row">
+        <div class="field"><label>Indicator</label><select class="input" name="indicator">${inds.map(([k, d]) => `<option value="${k}">${esc(d.label)}${flagged.includes(k) ? ' (flagged)' : ''}</option>`).join('')}</select></div>
+        <div class="field" style="flex:2 1 240px"><label>Strategy</label><select class="input" name="strategy_id"></select></div>
+      </div>
+      <div class="field"><label>Goal (what "worked" looks like)</label><input class="input" name="goal" placeholder="e.g. Missing work under 5 by the review date"></div>
+      <div class="row">
+        <div class="field"><label>Owner</label><input class="input" name="owner" list="staffList" placeholder="Staff member"></div>
+        <div class="field"><label>Review by</label><input class="input" type="date" name="review_date" value="${review}"></div>
+      </div>
+      <datalist id="staffList">${S.meta.staff.map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+      <div class="row"><button class="btn btn-primary" type="submit">Start plan</button><span class="err" role="alert"></span></div>
+    </form></div>`;
+}
+
+function fillStrategies(form) {
+  const ind = form.indicator.value;
+  const opts = S.meta.strategies.filter(s => s.indicator === ind);
+  form.strategy_id.innerHTML = opts.map(s => `<option value="${s.strategy_id}">Tier ${s.tier} · ${esc(s.name)}</option>`).join('') || '<option value="">No strategies yet</option>';
+}
+
+async function renderStudent(id) {
+  const v = $('view-student');
+  v.innerHTML = '<div class="empty">Loading…</div>';
+  try { S.cur = await api('/api/student/' + encodeURIComponent(id)); } catch (e) { v.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  const st = S.cur.student, snap = S.cur.history.at(-1);
+  $('title').textContent = 'Student ' + st.student_id;
+  v.innerHTML = `
+    <div class="row" style="align-items:center"><a href="#/queue" class="btn btn-ghost">← Queue</a>
+      <span class="meta">Grade ${st.grade ?? '—'} · Counselor ${esc(st.counselor || '—')} · Homeroom ${esc(st.homeroom || '—')}</span> ${tierTag(S.cur.tier)}</div>
+    <div class="grid2">
+      <div class="card panel"><span class="card-kicker">Indicators · ${fmtDate(snap?.as_of)}</span><div>${indicatorRows(snap)}</div></div>
+      ${newPlanForm(snap)}
+    </div>
+    <h4 style="margin:6px 0 0">Plans</h4>
+    <div class="stack">${S.cur.plans.map(planCard).join('') || '<div class="muted" style="font-size:14px">No plans yet.</div>'}</div>`;
+  const cf = v.querySelector('form[data-act=create]');
+  fillStrategies(cf);
+  cf.indicator.addEventListener('change', () => fillStrategies(cf));
+}
+
+$('view-student').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, err = f.querySelector('.err');
+  err.textContent = '';
+  const who = actor();
+  if (!who) { err.textContent = 'Enter your name under "Acting as" first.'; $('actor').focus(); return; }
+  const sid = S.cur.student.student_id;
+  try {
+    if (f.dataset.act === 'create') {
+      if (!f.strategy_id.value) throw new Error('Pick a strategy.');
+      if (!f.owner.value.trim()) throw new Error('Name an owner.');
+      await api('/api/interventions', { student_id: sid, indicator: f.indicator.value, strategy_id: f.strategy_id.value,
+        goal: f.goal.value, owner: f.owner.value, review_date: f.review_date.value, actor: who });
+    } else {
+      const pid = f.closest('[data-plan]').dataset.plan;
+      if (f.dataset.act === 'note') {
+        if (!f.body.value.trim()) throw new Error('Write a note first.');
+        await api(`/api/interventions/${pid}/notes`, { author: who, audience: f.audience.value, body: f.body.value });
+      } else {
+        if (!f.outcome.value) throw new Error('Choose an outcome.');
+        await api(`/api/interventions/${pid}/close`, { actor: who, outcome: f.outcome.value, note: f.note.value });
+      }
+    }
+    S.students = await api('/api/students');
+    renderStudent(sid);
+  } catch (ex) { err.textContent = ex.message; }
+});
+$('view-student').addEventListener('input', e => { const err = e.target.form?.querySelector('.err'); if (err) err.textContent = ''; });
+
+// ── Library ────────────────────────────────────────────────────
+function renderLibrary() {
+  const by = {};
+  S.meta.strategies.forEach(s => (by[s.indicator] = by[s.indicator] || []).push(s));
+  $('library').innerHTML = Object.entries(by).map(([k, list]) => `<div class="card panel"><span class="card-kicker">${esc(indLabel(k))}</span>
+    <div class="lib-ind">${list.map(s => `<div><div style="font-weight:500">Tier ${s.tier} · ${esc(s.name)}</div>
+      <div style="font-size:13px;color:var(--color-neutral-300)">${esc(s.description)}</div>
+      <div class="meta" style="font-size:12px">Evidence: ${esc(s.evidence)}</div></div>`).join('')}</div></div>`).join('');
+}
+
+// ── Router ─────────────────────────────────────────────────────
+async function route() {
+  if (!S.meta) await loadAll();
+  const [, view, arg] = location.hash.match(/^#\/(\w+)\/?([\w-]*)/) || [];
+  const v = ['queue', 'student', 'library'].includes(view) ? view : 'queue';
+  ['queue', 'student', 'library'].forEach(k => $('view-' + k).hidden = k !== v);
+  document.querySelectorAll('.side-link').forEach(a => a.toggleAttribute('aria-current', a.dataset.view === (v === 'student' ? 'queue' : v)));
+  document.querySelectorAll('.side-link[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
+  if (v === 'queue') { $('title').textContent = 'Queue'; S.students = await api('/api/students'); renderQueue(); }
+  if (v === 'library') { $('title').textContent = 'Strategy library'; renderLibrary(); }
+  if (v === 'student') renderStudent(arg);
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+route().catch(e => { $('view-queue').innerHTML = `<div class="empty">Can't reach the EWS server: ${esc(e.message)}</div>`; });
+</script>
+</body>
+</html>

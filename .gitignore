@@ -1,0 +1,9 @@
+# Student-level database (Student IDs, flags, plans, notes) - never commit
+*.db
+*.db.*
+# Logs, lock file, local backups, caches
+*.log
+*.lock
+*.bak-*
+__pycache__/
+*.pyc
