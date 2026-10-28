@@ -12,7 +12,9 @@ import subprocess
 import sys
 
 PY = sys.executable.replace("pythonw.exe", "python.exe")
-LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "daily-run.log")
+EWS = os.path.dirname(os.path.abspath(__file__))
+DASH = os.path.join(os.path.dirname(EWS), "PassingRateDashboard")  # the dashboard checkout beside this folder
+LOG = os.path.join(EWS, "daily-run.log")
 NO_WINDOW = 0x08000000  # CREATE_NO_WINDOW
 KEEP = re.compile(r'^(level|High|Middle|Elementary)\s|"(source|dataThrough|file)"|Error|Traceback')
 
@@ -42,11 +44,11 @@ def write_health(results, morning):
     """health.json in the shared Drive folder: each step's exit code plus when every source last
     updated (no Student IDs). The Apps Script health check reads it and emails Meghan if something's off."""
     import json
-    dash = r"C:\Users\mmerideth\PassingRateDashboard"
     try:
-        sys.path.insert(0, dash)
+        sys.path.insert(0, DASH)
+        import settings
         import sync
-        cfg = json.load(open(os.path.join(dash, "config.json"), encoding="utf-8"))
+        cfg = settings.load()
         doc = {"finishedAt": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
                "run": "morning" if morning else "afternoon", "ok": not any(c for _, c in results),
                "steps": [{"label": l, "code": c} for l, c in results], **sync.freshness()}
@@ -82,11 +84,11 @@ if __name__ == "__main__":
         log("Another refresh held the lock for 60+ min - skipped this run")
         sys.exit(1)
     log("Morning dashboard refresh started" if morning else "Daily refresh started")
-    steps = [("Dashboard sync", r"C:\Users\mmerideth\PassingRateDashboard\sync.py"),
-             ("Shared copy build", r"C:\Users\mmerideth\PassingRateDashboard\build_share.py"),
-             ("Weekly email build", r"C:\Users\mmerideth\PassingRateDashboard\build_email.py")]
+    steps = [("Dashboard sync", os.path.join(DASH, "sync.py")),
+             ("Shared copy build", os.path.join(DASH, "build_share.py")),
+             ("Weekly email build", os.path.join(DASH, "build_email.py"))]
     if not morning:
-        steps.append(("EWS run", r"C:\Users\mmerideth\EWS\ews.py"))
+        steps.append(("EWS run", os.path.join(EWS, "ews.py")))
     codes = [run(label, script) for label, script in steps]
     log("Refresh finished" + ("" if not any(codes) else " WITH ERRORS"))
     write_health([(label, code) for (label, _), code in zip(steps, codes)], morning)

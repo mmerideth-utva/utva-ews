@@ -21,11 +21,15 @@ import openpyxl
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("EWS_DB") or os.path.join(ROOT, "ews.db")  # EWS_DB: point tests at a copy
 # Prototype reuse: Canvas client + attendance parser live in the passing-rate dashboard
-sys.path.insert(0, r"C:\Users\mmerideth\PassingRateDashboard")
+# (a PassingRateDashboard checkout beside this folder, or UTVA_DASHBOARD)
+DASH_ROOT = os.environ.get("UTVA_DASHBOARD") or os.path.join(os.path.dirname(ROOT), "PassingRateDashboard")
+sys.path.insert(0, DASH_ROOT)
 import sync as dash  # noqa: E402
 import attendance as dash_att  # noqa: E402
+import settings  # noqa: E402
 
-CFG = json.load(open(os.path.join(ROOT, "ews_config.json"), encoding="utf-8"))
+# ews_config.local.json (git-ignored) overrides this laptop's paths, like the dashboard's config.local.json
+CFG = settings.load(os.path.join(ROOT, "ews_config.json"), os.path.join(ROOT, "ews_config.local.json"))
 TODAY = dt.date.today().isoformat()
 
 
@@ -154,7 +158,7 @@ def ingest_canvas(con):
 
 # ── Stage 3: attendance ────────────────────────────────────────
 def ingest_attendance():
-    acfg = dash.read_json(os.path.join(r"C:\Users\mmerideth\PassingRateDashboard", "config.json"))["attendance"]
+    acfg = settings.load()["attendance"]
     label, _src, parsed = dash_att.load_newest(acfg)  # Drive folder first, in memory
     if not parsed:
         return {}, {"source": None}

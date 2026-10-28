@@ -7,3 +7,5 @@
 *.bak-*
 __pycache__/
 *.pyc
+# Per-laptop path overrides (see ONBOARDING.md)
+ews_config.local.json
